@@ -1,18 +1,13 @@
 package `in`.neuw.resource.demo.config
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest
 import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.boot.actuate.info.InfoEndpoint
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
-import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.web.reactive.config.WebFluxConfigurer
-import java.util.*
 
 @EnableReactiveMethodSecurity
 class SecurityConfig: WebFluxConfigurer {
@@ -21,6 +16,8 @@ class SecurityConfig: WebFluxConfigurer {
     fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain? {
         http
                 .authorizeExchange()
+                // health and info url's will be open(permitted to all) others will be checked for authorization
+                .matchers(EndpointRequest.to(HealthEndpoint::class.java, InfoEndpoint::class.java)).permitAll()
                 .anyExchange().authenticated()
                 .and()
                 .oauth2ResourceServer()
