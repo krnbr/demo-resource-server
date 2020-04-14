@@ -17,9 +17,6 @@ import java.util.*
 @EnableReactiveMethodSecurity
 class SecurityConfig: WebFluxConfigurer {
 
-    @Autowired
-    private lateinit var resourceServerProperties: OAuth2ResourceServerProperties
-
     @Bean
     fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain? {
         http
@@ -28,13 +25,8 @@ class SecurityConfig: WebFluxConfigurer {
                 .and()
                 .oauth2ResourceServer()
                 .jwt()
-                .jwtDecoder(decoder())
 
         return http.build()
-    }
-
-    private fun decoder(): ReactiveJwtDecoder? {
-        return NimbusReactiveJwtDecoder(Objects.requireNonNull(resourceServerProperties!!.jwt.jwkSetUri))
     }
 
 }
