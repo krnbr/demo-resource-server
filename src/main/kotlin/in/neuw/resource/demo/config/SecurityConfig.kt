@@ -1,5 +1,7 @@
 package `in`.neuw.resource.demo.config
 
+import `in`.neuw.resource.demo.security.CustomBearerTokenServerAccessDeniedHandler
+import `in`.neuw.resource.demo.security.CustomBearerTokenServerAuthenticationEntryPoint
 import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest
 import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.boot.actuate.info.InfoEndpoint
@@ -13,6 +15,16 @@ import org.springframework.web.reactive.config.WebFluxConfigurer
 class SecurityConfig: WebFluxConfigurer {
 
     @Bean
+    fun authenticationEntryPoint(): CustomBearerTokenServerAuthenticationEntryPoint {
+        return CustomBearerTokenServerAuthenticationEntryPoint()
+    }
+
+    @Bean
+    fun accessDeniedHandler(): CustomBearerTokenServerAccessDeniedHandler {
+        return CustomBearerTokenServerAccessDeniedHandler()
+    }
+
+    @Bean
     fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain? {
         http
                 .authorizeExchange()
@@ -21,6 +33,8 @@ class SecurityConfig: WebFluxConfigurer {
                 .anyExchange().authenticated()
                 .and()
                 .oauth2ResourceServer()
+                .authenticationEntryPoint(authenticationEntryPoint())
+                .accessDeniedHandler(accessDeniedHandler())
                 .jwt()
 
         return http.build()
